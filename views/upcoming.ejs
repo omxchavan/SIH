@@ -8,8 +8,8 @@
     
     <style>
         :root {
-            --primary: #ca34db;
-            --primary-dark: #9f29b9;
+            --primary: #b734db;
+            --primary-dark: #aa29b9;
             --secondary: #2c3e50;
             --accent: #e74c3c;
             --accent-light: #ff7f6a;
@@ -17,7 +17,7 @@
             --dark: #2c3e50;
             --text: #333;
             --text-light: #7f8c8d;
-            --gradient-start: #8830bf;
+            --gradient-start: #bf34db;
             --gradient-end: #2c3e50;
             --card-bg: #ffffff;
             --success: #27ae60;
@@ -35,7 +35,6 @@
             line-height: 1.6;
             color: var(--text);
             overflow-x: hidden;
-            background-color: #f9f9f9;
         }
         
         /* Header */
@@ -51,13 +50,6 @@
             align-items: center;
             z-index: 1000;
             box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        .navbar.scrolled {
-            padding: 0.7rem 5%;
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
         }
         
         .logo {
@@ -106,6 +98,14 @@
         }
         
         .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+        }
+        
+        .nav-links a.active::after {
             width: 100%;
         }
         
@@ -525,7 +525,217 @@
             }
         }
         
+        /* Upcoming Features Styles */
+        .upcoming-features {
+            padding: 8rem 5% 5rem;
+            background: var(--light);
+        }
+        
+        .feature-hero {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 4rem;
+        }
+        
+        .feature-hero h1 {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-hero p {
+            font-size: 1.2rem;
+            color: var(--text-light);
+            line-height: 1.8;
+        }
+        
+        .ai-features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .ai-feature-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .ai-feature-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .ai-feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .ai-feature-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .ai-feature-header i {
+            font-size: 2.5rem;
+        }
+        
+        .ai-feature-header h3 {
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        
+        .ai-feature-content {
+            padding: 2rem;
+        }
+        
+        .ai-feature-content p {
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .timeline {
+            max-width: 1000px;
+            margin: 4rem auto;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            background: var(--primary);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 4rem;
+            position: relative;
+            opacity: 0;
+            transform: translateY(50px);
+        }
+        
+        .timeline-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        
+        .timeline-content {
+            width: 45%;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .timeline-content::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            background: var(--card-bg);
+            transform: translateY(-50%) rotate(45deg);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content::after {
+            right: -10px;
+        }
+        
+        .timeline-item:nth-child(even) .timeline-content::after {
+            left: -10px;
+        }
+        
+        .timeline-dot {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+        }
+        
+        .timeline-date {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-title {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
         /* Responsive */
+        @media (max-width: 968px) {
+            .timeline::before {
+                left: 30px;
+            }
+            
+            .timeline-item {
+                flex-direction: row !important;
+            }
+            
+            .timeline-content {
+                width: calc(100% - 80px);
+                margin-left: 80px;
+            }
+            
+            .timeline-content::after {
+                left: -10px !important;
+                right: auto !important;
+            }
+            
+            .timeline-dot {
+                left: 30px;
+            }
+        }
+        
         @media (max-width: 768px) {
             .navbar {
                 padding: 1rem 3%;
@@ -567,6 +777,14 @@
             .stat-item h3 {
                 font-size: 2.5rem;
             }
+            
+            .feature-hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .ai-features-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -578,95 +796,123 @@
             <li><a href="/">Home</a></li>
             <li><a href="/map">Live Map</a></li>
             <li><a href="/analysis">Train Analysis</a></li>
-            <li><a href="/upcoming">Upcoming Features</a></li>
+            <li><a href="/upcoming-features" class="active">Upcoming Features</a></li>
         </ul>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="particles" id="particles"></div>
-        <div class="floating-train">🚂</div>
-        <div class="hero-content">
-            <h1>Real-time Train Management Revolution</h1>
-            <p>Advanced analytics and live tracking for delay prevention and optimal train operations across India's railway network</p>
-            <div class="cta-buttons">
-                <a href="/map" class="btn btn-primary"><i class="fas fa-map-marked-alt"></i> View Live Map</a>
-                <a href="/analysis" class="btn btn-secondary"><i class="fas fa-chart-line"></i> Analyze Trains</a>
+    <!-- Upcoming Features Page -->
+    <section class="upcoming-features">
+        <div class="feature-hero">
+            <h1>Intelligent Railway Management</h1>
+            <p>Discover our upcoming AI-powered features designed to revolutionize how Indian Railways manages train movements, optimizes network efficiency, and enhances decision-making for traffic controllers.</p>
+        </div>
+        
+        <div class="ai-features-grid">
+            <div class="ai-feature-card">
+                <div class="ai-feature-header">
+                    <i class="fas fa-brain"></i>
+                    <h3>AI Decision Support System</h3>
+                </div>
+                <div class="ai-feature-content">
+                    <p>An intelligent system that assists section controllers in making optimized, real-time decisions for train precedence and crossings using advanced algorithms.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Dynamic conflict-free scheduling</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time optimization under disruptions</li>
+                        <li><i class="fas fa-check-circle"></i> Constraint modeling and priority management</li>
+                        <li><i class="fas fa-check-circle"></i> Explanations for recommendations</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="ai-feature-card">
+                <div class="ai-feature-header">
+                    <i class="fas fa-robot"></i>
+                    <h3>Railway Operations Chatbot</h3>
+                </div>
+                <div class="ai-feature-content">
+                    <p>An intelligent assistant that helps traffic controllers quickly access information, run simulations, and get recommendations through natural language queries.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Natural language processing</li>
+                        <li><i class="fas fa-check-circle"></i> Real-time operational queries</li>
+                        <li><i class="fas fa-check-circle"></i> Scenario simulation requests</li>
+                        <li><i class="fas fa-check-circle"></i> Multilingual support</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="ai-feature-card">
+                <div class="ai-feature-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Predictive Analytics Module</h3>
+                </div>
+                <div class="ai-feature-content">
+                    <p>Advanced machine learning models that predict potential delays, congestion points, and optimal routing strategies before issues occur.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Delay prediction algorithms</li>
+                        <li><i class="fas fa-check-circle"></i> Congestion forecasting</li>
+                        <li><i class="fas fa-check-circle"></i> Predictive maintenance alerts</li>
+                        <li><i class="fas fa-check-circle"></i> Network capacity optimization</li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features">
-        <h2 class="section-title">Transforming Railway Operations</h2>
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-map-marker-alt"></i></span>
-                <h3>Real-time Tracking</h3>
-                <p>Monitor live positions of trains across the entire network with GPS-accurate location data and instant updates every 30 seconds.</p>
+        
+        <h2 class="section-title">Development Roadmap</h2>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q3 2023</div>
+                    <h3 class="timeline-title">Research & Planning</h3>
+                    <p>Comprehensive analysis of railway operations, constraint identification, and algorithm selection.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-bolt"></i></span>
-                <h3>Delay Prevention</h3>
-                <p>AI-powered predictive analytics to identify potential delays before they occur, enabling proactive route optimization and schedule adjustments.</p>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q4 2023</div>
+                    <h3 class="timeline-title">Prototype Development</h3>
+                    <p>Building the core optimization engine and initial UI for controller decision support.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-chart-bar"></i></span>
-                <h3>Smart Analytics</h3>
-                <p>Comprehensive data analysis including route performance, station dwell times, and passenger flow patterns for operational insights.</p>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q1 2024</div>
+                    <h3 class="timeline-title">API Integration</h3>
+                    <p>Connecting with existing railway systems (signalling, TMS, timetables) via secure APIs.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-sync-alt"></i></span>
-                <h3>Dynamic Scheduling</h3>
-                <p>Intelligent rescheduling algorithms that automatically adjust timetables based on real-time conditions and traffic optimization.</p>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q2 2024</div>
+                    <h3 class="timeline-title">Testing & Validation</h3>
+                    <p>Rigorous testing with historical data and controlled environment simulations.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-mobile-alt"></i></span>
-                <h3>Mobile Dashboard</h3>
-                <p>Access critical information anywhere with our responsive web interface designed for railway control centers and field operations.</p>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q3 2024</div>
+                    <h3 class="timeline-title">Pilot Deployment</h3>
+                    <p>Limited deployment in select railway sections for real-world testing and feedback.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon"><i class="fas fa-shield-alt"></i></span>
-                <h3>Safety Monitoring</h3>
-                <p>Advanced safety protocols with automated alerts for speed violations, signal compliance, and emergency response coordination.</p>
+            <div class="timeline-item">
+                <div class="timeline-content">
+                    <div class="timeline-date">Q4 2024</div>
+                    <h3 class="timeline-title">Full Implementation</h3>
+                    <p>System-wide rollout with training programs for traffic controllers.</p>
+                </div>
+                <div class="timeline-dot"></div>
             </div>
-        </div>
-    </section>
-
-    <!-- Stats Section -->
-    <section class="stats">
-        <div class="stats-grid">
-            <div class="stat-item">
-                <h3>99.2%</h3>
-                <p>System Uptime</p>
-            </div>
-            <div class="stat-item">
-                <h3>15min</h3>
-                <p>Avg Delay Reduction</p>
-            </div>
-            <div class="stat-item">
-                <h3>500+</h3>
-                <p>Trains Monitored</p>
-            </div>
-            <div class="stat-item">
-                <h3>24/7</h3>
-                <p>Live Monitoring</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <h2>Ready to Transform Your Railway Operations?</h2>
-        <p>Join the future of intelligent railway management with our comprehensive real-time tracking and analytics platform designed for modern transportation needs.</p>
-        <div class="cta-buttons">
-            <a href="/map" class="btn btn-primary"><i class="fas fa-rocket"></i> Start Live Tracking</a>
-            <a href="/analysis" class="btn btn-secondary"><i class="fas fa-chart-pie"></i> Explore Analytics</a>
         </div>
     </section>
 
@@ -736,7 +982,7 @@
         }, observerOptions);
         
         // Observe feature cards and stat items
-        document.querySelectorAll('.feature-card, .stat-item').forEach(item => {
+        document.querySelectorAll('.feature-card, .stat-item, .ai-feature-card, .timeline-item').forEach(item => {
             observer.observe(item);
         });
         

@@ -3,104 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pune Live Train Tracker</title>
+    <title>Pune Live Train Tracker | RailTrack Pro</title>
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
+        :root {
+            --primary: #d334db;
+            --primary-dark: #b429b9;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #334155;
+            --text-light: #64748b;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
             color: white;
-            padding: 15px 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
         }
         
         .header h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        
-        .controls {
-            background: white;
-            padding: 10px 20px;
-            border-bottom: 1px solid #e0e0e0;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Controls */
+        .controls {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             flex-wrap: wrap;
+            gap: 1rem;
+            box-shadow: var(--shadow-sm);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
         
         .refresh-btn {
-            background: #4CAF50;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .refresh-btn:hover {
-            background: #45a049;
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
         
         .refresh-btn:disabled {
-            background: #cccccc;
+            background: var(--text-light);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .filter-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            font-family: inherit;
+        }
+        
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
         
         .status {
-            font-size: 14px;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .status.success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
+            background: #d1fae5;
+            color: var(--success);
         }
         
         .status.error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: #fee2e2;
+            color: var(--error);
         }
         
+        .last-updated {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        /* Map */
         #map {
-            height: calc(100vh - 120px);
+            height: calc(100vh - 180px);
             width: 100%;
+            z-index: 1;
         }
         
+        /* Train List Panel */
+        .train-list-panel {
+            position: fixed;
+            top: 130px;
+            right: 20px;
+            width: 320px;
+            max-height: calc(100vh - 180px);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .train-list-header {
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border-top-left-radius: var(--radius);
+            border-top-right-radius: var(--radius);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .train-list-header h3 {
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .close-panel {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        .train-list {
+            padding: 0.5rem;
+        }
+        
+        .train-list-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .train-list-item:hover {
+            background: #f1f5f9;
+        }
+        
+        .train-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .train-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .train-number {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .train-type {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 20px;
+            background: #e0f2fe;
+            color: var(--primary);
+        }
+        
+        .train-name {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .train-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+        
+        /* Train Popup */
         .train-popup {
-            font-size: 12px;
-            line-height: 1.4;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            min-width: 250px;
         }
         
         .train-popup h3 {
             margin: 0 0 8px 0;
-            color: #333;
-            font-size: 14px;
+            color: var(--secondary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .train-popup p {
-            margin: 3px 0;
+            margin: 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .train-popup .train-number {
             font-weight: bold;
-            color: #1976d2;
+            color: var(--primary);
         }
         
+        .popup-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        /* Legend */
+        .map-legend {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+        }
+        
+        .legend-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .legend-items {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        /* Toggle Button */
+        .toggle-list-btn {
+            position: fixed;
+            top: 130px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 999;
+            transition: var(--transition);
+        }
+        
+        .toggle-list-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Loading */
         .loading {
             position: fixed;
             top: 50%;
@@ -108,31 +438,213 @@
             transform: translate(-50%, -50%);
             background: rgba(0,0,0,0.8);
             color: white;
-            padding: 20px;
-            border-radius: 5px;
+            padding: 20px 30px;
+            border-radius: var(--radius);
             display: none;
+            z-index: 2000;
+            text-align: center;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 968px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .controls-left, .controls-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .train-list-panel {
+                width: 280px;
+            }
+            
+            .legend-items {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 0.75rem;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .header {
+                padding: 1.25rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.7rem;
+            }
+            
+            .controls {
+                padding: 1rem;
+            }
+            
+            .filter-controls {
+                flex-wrap: wrap;
+            }
+            
+            .train-list-panel {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+            
+            .map-legend {
+                bottom: 10px;
+                left: 10px;
+                right: 10px;
+                padding: 0.75rem;
+            }
+            
+            .legend-items {
+                grid-template-columns: 1fr 1fr;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-train"></i> RailTrack Pro</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/map" class="active">Live Map</a></li>
+            <li><a href="/analysis">Train Analysis</a></li>
+            <li><a href="/upcoming-features">Upcoming Features</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
     <div class="header">
-        <h1>🚂 Pune Live Train Tracker</h1>
-    </div>
-    
-    <div class="controls">
-        <button class="refresh-btn" onclick="refreshTrains()">🔄 Refresh Data</button>
-        <div id="status" class="status">
-            <% if (error) { %>
-                <span class="status error">❌ <%= error %></span>
-            <% } else { %>
-                <span class="status success">✅ Showing <%= trains.length %> active trains</span>
-            <% } %>
+        <div class="header-content">
+            <h1><i class="fas fa-map-marked-alt"></i> Pune Live Train Tracker</h1>
+            <p>Real-time tracking of trains in and around Pune railway station</p>
         </div>
-        <div>Last updated: <span id="lastUpdated"><%= new Date().toLocaleTimeString() %></span></div>
     </div>
     
+    <!-- Controls -->
+    <div class="controls">
+        <div class="controls-left">
+            <button class="refresh-btn" onclick="refreshTrains()">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
+            
+            <div class="filter-controls">
+                <select class="filter-select" id="trainTypeFilter">
+                    <option value="all">All Train Types</option>
+                    <option value="EXPRESS">Express</option>
+                    <option value="PASSENGER">Passenger</option>
+                    <option value="SUPERFAST">Superfast</option>
+                    <option value="LOCAL">Local</option>
+                    <option value="RAJDHANI">Rajdhani</option>
+                    <option value="SHATABDI">Shatabdi</option>
+                </select>
+                
+                <select class="filter-select" id="statusFilter">
+                    <option value="all">All Statuses</option>
+                    <option value="moving">Moving</option>
+                    <option value="stopped">Stopped</option>
+                    <option value="delayed">Delayed</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="controls-right">
+            <div id="status" class="status success">
+                <i class="fas fa-check-circle"></i> Showing <span id="trainCount">0</span> active trains
+            </div>
+            
+            <div class="last-updated">
+                <i class="fas fa-clock"></i> Last updated: <span id="lastUpdated"><%= new Date().toLocaleTimeString() %></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Map -->
     <div id="map"></div>
-    <div class="loading" id="loading">🔄 Loading train data...</div>
+    
+    <!-- Toggle Train List Button -->
+    <button class="toggle-list-btn" onclick="toggleTrainList()">
+        <i class="fas fa-list"></i>
+    </button>
+    
+    <!-- Train List Panel -->
+    <div class="train-list-panel" id="trainListPanel">
+        <div class="train-list-header">
+            <h3><i class="fas fa-train"></i> Active Trains</h3>
+            <button class="close-panel" onclick="toggleTrainList()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="train-list" id="trainList">
+            <!-- Train items will be populated here -->
+        </div>
+    </div>
+    
+    <!-- Map Legend -->
+    <div class="map-legend">
+        <div class="legend-title"><i class="fas fa-info-circle"></i> Train Types</div>
+        <div class="legend-items">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e74c3c;"></div>
+                <span>Express</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3498db;"></div>
+                <span>Passenger</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #f39c12;"></div>
+                <span>Superfast</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #27ae60;"></div>
+                <span>Local</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #9b59b6;"></div>
+                <span>Rajdhani</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #e67e22;"></div>
+                <span>Shatabdi</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p>Loading train data...</p>
+    </div>
     
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -140,27 +652,39 @@
     <script>
         let map;
         let trainMarkers = [];
+        let trainLayerGroup = L.layerGroup();
+        let currentTrains = [];
         
         // Initialize map centered on Pune
         function initMap() {
-            map = L.map('map').setView([18.5204, 73.8567], 11);
+            map = L.map('map').setView([18.5204, 73.8567], 12);
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
+            
+            // Add railway layer
+            L.tileLayer('https://{s}.tile.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+                attribution: '© OpenRailwayMap contributors',
+                opacity: 0.3
+            }).addTo(map);
+            
+            trainLayerGroup.addTo(map);
         }
         
         // Create custom train icon
-        function createTrainIcon(trainType) {
+        function createTrainIcon(trainType, isStopped) {
             const color = getTrainColor(trainType);
+            
             return L.divIcon({
                 html: `<div style="
                     background: ${color};
-                    width: 12px;
-                    height: 12px;
+                    width: 16px;
+                    height: 16px;
                     border-radius: 50%;
-                    border: 2px solid white;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                    border: 3px solid white;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                    position: relative;
                 "></div>`,
                 className: 'custom-train-icon',
                 iconSize: [16, 16],
@@ -183,35 +707,51 @@
         
         // Clear existing markers
         function clearMarkers() {
-            trainMarkers.forEach(marker => map.removeLayer(marker));
+            trainLayerGroup.clearLayers();
             trainMarkers = [];
         }
         
         // Add trains to map
         function addTrainsToMap(trains) {
             clearMarkers();
+            currentTrains = trains;
+            
+            // Update train count
+            document.getElementById('trainCount').textContent = trains.length;
+            
+            // Update train list
+            updateTrainList(trains);
             
             trains.forEach(train => {
                 if (train.current_lat && train.current_lng) {
                     const marker = L.marker([train.current_lat, train.current_lng], {
                         icon: createTrainIcon(train.type)
-                    }).addTo(map);
+                    });
                     
                     const popupContent = `
                         <div class="train-popup">
-                            <h3>${train.train_name}</h3>
-                            <p><span class="train-number">Train #${train.train_number}</span></p>
-                            <p><strong>Type:</strong> ${train.type || 'N/A'}</p>
-                            <p><strong>Current Station:</strong> ${train.current_station_name || 'Unknown'}</p>
-                            <p><strong>Next Station:</strong> ${train.next_station_name || 'Unknown'}</p>
-                            <p><strong>Distance from Source:</strong> ${train.distance_from_source_km || 0} km</p>
-                            <p><strong>Next Distance:</strong> ${train.next_distance || 0} km</p>
-                            ${train.departure_minutes ? `<p><strong>Departed:</strong> ${train.departure_minutes} min ago</p>` : ''}
-                            ${train.next_arrival_minutes ? `<p><strong>Next Arrival:</strong> ${train.next_arrival_minutes} min</p>` : ''}
+                            <h3><i class="fas fa-train"></i> ${train.train_name}</h3>
+                            <p><span class="train-number"><i class="fas fa-hashtag"></i> ${train.train_number}</span></p>
+                            <p><i class="fas fa-tag"></i> <strong>Type:</strong> ${train.type || 'N/A'}</p>
+                            
+                            <div class="popup-section">
+                                <p><i class="fas fa-map-marker-alt"></i> <strong>Current Station:</strong> ${train.current_station_name || 'Unknown'}</p>
+                                <p><i class="fas fa-road"></i> <strong>Distance from Source:</strong> ${train.distance_from_source_km || 0} km</p>
+                                ${train.departure_minutes ? `<p><i class="fas fa-sign-out-alt"></i> <strong>Departed:</strong> ${train.departure_minutes} min ago</p>` : ''}
+                            </div>
+                            
+                            ${train.next_station_name ? `
+                            <div class="popup-section">
+                                <p><i class="fas fa-arrow-right"></i> <strong>Next Station:</strong> ${train.next_station_name}</p>
+                                <p><i class="fas fa-road"></i> <strong>Next Distance:</strong> ${train.next_distance || 0} km</p>
+                                ${train.next_arrival_minutes ? `<p><i class="fas fa-clock"></i> <strong>Next Arrival:</strong> ${train.next_arrival_minutes} min</p>` : ''}
+                            </div>
+                            ` : ''}
                         </div>
                     `;
                     
                     marker.bindPopup(popupContent);
+                    marker.addTo(trainLayerGroup);
                     trainMarkers.push(marker);
                     
                     // Add next station marker if available
@@ -220,17 +760,18 @@
                             color: '#95a5a6',
                             fillColor: '#bdc3c7',
                             fillOpacity: 0.7,
-                            radius: 4
-                        }).addTo(map);
+                            radius: 5
+                        });
                         
                         nextStationMarker.bindPopup(`
                             <div class="train-popup">
-                                <h3>Next Station</h3>
+                                <h3><i class="fas fa-map-pin"></i> Next Station</h3>
                                 <p><strong>${train.next_station_name}</strong></p>
                                 <p>Expected arrival: ${train.next_arrival_minutes || 'N/A'} min</p>
                             </div>
                         `);
                         
+                        nextStationMarker.addTo(trainLayerGroup);
                         trainMarkers.push(nextStationMarker);
                         
                         // Draw line between current position and next station
@@ -239,15 +780,107 @@
                             [train.next_lat, train.next_lng]
                         ], {
                             color: getTrainColor(train.type),
-                            weight: 2,
-                            opacity: 0.5,
+                            weight: 3,
+                            opacity: 0.7,
                             dashArray: '5, 5'
-                        }).addTo(map);
+                        });
                         
+                        line.addTo(trainLayerGroup);
                         trainMarkers.push(line);
                     }
                 }
             });
+        }
+        
+        // Update train list panel
+        function updateTrainList(trains) {
+            const trainList = document.getElementById('trainList');
+            trainList.innerHTML = '';
+            
+            if (trains.length === 0) {
+                trainList.innerHTML = '<div class="train-list-item">No trains found</div>';
+                return;
+            }
+            
+            trains.forEach(train => {
+                const item = document.createElement('div');
+                item.className = 'train-list-item';
+                item.onclick = () => {
+                    const marker = trainMarkers.find(m => {
+                        const latLng = m.getLatLng();
+                        return latLng.lat === train.current_lat && latLng.lng === train.current_lng;
+                    });
+                    if (marker) {
+                        map.setView(marker.getLatLng(), 14);
+                        marker.openPopup();
+                    }
+                };
+                
+                item.innerHTML = `
+                    <div class="train-item-header">
+                        <span class="train-number">#${train.train_number}</span>
+                        <span class="train-type">${train.type || 'N/A'}</span>
+                    </div>
+                    <div class="train-name">${train.train_name}</div>
+                    <div class="train-details">
+                        <span><i class="fas fa-map-marker-alt"></i> ${train.current_station_name || 'Unknown'}</span>
+                        <span><i class="fas fa-road"></i> ${train.distance_from_source_km || 0} km</span>
+                        <span><i class="fas fa-arrow-right"></i> ${train.next_station_name || 'N/A'}</span>
+                        <span><i class="fas fa-clock"></i> ${train.next_arrival_minutes || 'N/A'} min</span>
+                    </div>
+                `;
+                
+                trainList.appendChild(item);
+            });
+        }
+        
+        // Toggle train list panel
+        function toggleTrainList() {
+            const panel = document.getElementById('trainListPanel');
+            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        // Filter trains based on selections
+        function filterTrains() {
+            const typeFilter = document.getElementById('trainTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            let filteredTrains = currentTrains;
+            
+            // Apply type filter
+            if (typeFilter !== 'all') {
+                filteredTrains = filteredTrains.filter(train => 
+                    train.type && train.type.toUpperCase() === typeFilter
+                );
+            }
+            
+            // Apply status filter
+            if (statusFilter !== 'all') {
+                if (statusFilter === 'moving') {
+                    filteredTrains = filteredTrains.filter(train => 
+                        train.next_arrival_minutes && train.next_arrival_minutes < 30
+                    );
+                } else if (statusFilter === 'stopped') {
+                    filteredTrains = filteredTrains.filter(train => 
+                        !train.next_arrival_minutes || train.next_arrival_minutes >= 30
+                    );
+                } else if (statusFilter === 'delayed') {
+                    filteredTrains = filteredTrains.filter(train => 
+                        train.delay_minutes && train.delay_minutes > 10
+                    );
+                }
+            }
+            
+            addTrainsToMap(filteredTrains);
+            
+            // Update status
+            const status = document.getElementById('status');
+            status.innerHTML = `<i class="fas fa-check-circle"></i> Showing ${filteredTrains.length} trains`;
+            status.className = `status ${filteredTrains.length > 0 ? 'success' : 'error'}`;
+            
+            if (filteredTrains.length === 0) {
+                status.innerHTML = '<i class="fas fa-exclamation-circle"></i> No trains match filters';
+            }
         }
         
         // Refresh train data
@@ -258,7 +891,7 @@
             const lastUpdated = document.getElementById('lastUpdated');
             
             button.disabled = true;
-            button.textContent = '🔄 Loading...';
+            button.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Loading...';
             loading.style.display = 'block';
             
             try {
@@ -267,17 +900,20 @@
                 
                 if (data.success) {
                     addTrainsToMap(data.trains);
-                    status.innerHTML = `<span class="status success">✅ Showing ${data.trains.length} active trains</span>`;
+                    status.innerHTML = `<i class="fas fa-check-circle"></i> Showing ${data.trains.length} active trains`;
+                    status.className = 'status success';
                     lastUpdated.textContent = new Date().toLocaleTimeString();
                 } else {
-                    status.innerHTML = `<span class="status error">❌ ${data.error}</span>`;
+                    status.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${data.error}`;
+                    status.className = 'status error';
                 }
             } catch (error) {
                 console.error('Error refreshing data:', error);
-                status.innerHTML = `<span class="status error">❌ Failed to refresh data</span>`;
+                status.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed to refresh data';
+                status.className = 'status error';
             } finally {
                 button.disabled = false;
-                button.textContent = '🔄 Refresh Data';
+                button.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
                 loading.style.display = 'none';
             }
         }
@@ -286,14 +922,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             initMap();
             
+            // Set up filter event listeners
+            document.getElementById('trainTypeFilter').addEventListener('change', filterTrains);
+            document.getElementById('statusFilter').addEventListener('change', filterTrains);
+            
             // Load initial train data
             const initialTrains = <%- JSON.stringify(trains) %>;
             if (initialTrains && initialTrains.length > 0) {
                 addTrainsToMap(initialTrains);
+            } else {
+                // If no initial data, refresh
+                refreshTrains();
             }
             
             // Auto-refresh every 30 seconds
-            setInterval(refreshTrains, 30000);
+            setInterval(refreshTrains, 3000000);
         });
     </script>
 </body>

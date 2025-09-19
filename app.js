@@ -33,12 +33,15 @@ app.use(express.static(publicDir));
 app.use(express.json());
 
 // Replace with your actual API key
-const API_KEY = '';
+const API_KEY = 'rr_live_DmpAjfvV_IHoLFLL6q9gw2DrkRQIobyu';
 const API_URL = 'https://railradar.in/api/v1/trains/live-map';
 
 // Route to render the home page
 app.get('/', (req, res) => {
   res.render('index');
+});
+app.get('/upcoming', (req, res) => {
+  res.render('upcoming');
 });
 
 // Route to render the live map page
@@ -93,6 +96,7 @@ app.get('/analysis/:trainNumber', async (req, res) => {
     });
 
     if (response.data.success) {
+        console.log(response)
       res.render('analysis', { 
         trainData: response.data.data,
         error: null,
@@ -136,6 +140,7 @@ app.get('/api/trains/:trainNumber', async (req, res) => {
     });
 
     if (response.data.success) {
+        console.log(response)
       res.json({
         success: true,
         data: response.data.data

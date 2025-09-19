@@ -4,8 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Train Analysis - RailTrack Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --accent: #e74c3c;
+            --accent-light: #ff7f6a;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --text: #334155;
+            --text-light: #64748b;
+            --card-bg: #ffffff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --border: #e2e8f0;
+            --gradient-start: #d034db;
+            --gradient-end: #2c3e50;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius: 12px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -13,81 +39,144 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f7fa;
-            color: #333;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
         }
         
         /* Navigation */
         .navbar {
-            background: white;
+            background: var(--card-bg);
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow-md);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+        
+        .navbar.scrolled {
+            padding: 0.8rem 2rem;
+            box-shadow: var(--shadow-lg);
         }
         
         .logo {
             font-size: 1.5rem;
-            font-weight: bold;
-            color: #2c3e50;
+            font-weight: 700;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
         }
         
         .nav-links {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             list-style: none;
         }
         
         .nav-links a {
             text-decoration: none;
-            color: #2c3e50;
+            color: var(--text);
             font-weight: 500;
             padding: 8px 16px;
-            border-radius: 5px;
-            transition: all 0.3s;
+            border-radius: 8px;
+            transition: var(--transition);
+            position: relative;
         }
         
         .nav-links a:hover {
-            background: #3498db;
-            color: white;
+            color: var(--primary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .nav-links a.active {
+            color: var(--primary);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .nav-links a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 16px;
+            right: 16px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 2px;
         }
         
         /* Header */
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
             color: white;
-            padding: 2rem;
+            padding: 3rem 2rem;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            margin: 0 auto;
+            animation: fadeInUp 0.8s ease-out;
         }
         
         .header h1 {
             font-size: 2.5rem;
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
         
         .header p {
             font-size: 1.1rem;
             opacity: 0.9;
+            font-weight: 400;
         }
         
         /* Search Section */
         .search-section {
-            background: white;
-            padding: 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--radius);
+            margin: -1.5rem 2rem 0;
+            position: relative;
+            z-index: 10;
+            animation: slideInUp 0.8s ease-out;
         }
         
         .search-container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
         
         .search-form {
             display: grid;
             grid-template-columns: 2fr 2fr 1fr;
-            gap: 1rem;
+            gap: 1.5rem;
             align-items: end;
         }
         
@@ -99,79 +188,121 @@
         .form-group label {
             font-weight: 600;
             margin-bottom: 0.5rem;
-            color: #2c3e50;
+            color: var(--secondary);
+            font-size: 0.9rem;
         }
         
         .form-group input {
-            padding: 12px;
-            border: 2px solid #e1e8ed;
-            border-radius: 8px;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
             font-size: 1rem;
-            transition: border-color 0.3s;
+            transition: var(--transition);
+            background: var(--light);
+            font-family: inherit;
         }
         
         .form-group input:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
         
         .search-btn {
-            background: #3498db;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 10px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .search-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.6s ease;
+        }
+        
+        .search-btn:hover::before {
+            left: 100%;
         }
         
         .search-btn:hover {
-            background: #2980b9;
+            background: var(--primary-dark);
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
         }
         
         .search-btn:disabled {
-            background: #bdc3c7;
+            background: #94a3b8;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
         
         /* Content */
         .content {
             max-width: 1200px;
-            margin: 2rem auto;
+            margin: 3rem auto;
             padding: 0 2rem;
         }
         
         /* Error/Status Messages */
         .message {
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-radius: 10px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: fadeIn 0.5s ease-out;
+            box-shadow: var(--shadow-sm);
         }
         
         .message.error {
-            background: #fee;
-            color: #c0392b;
-            border: 1px solid #fadbd8;
+            background: #fef2f2;
+            color: var(--error);
+            border: 1px solid #fecaca;
         }
         
         .message.success {
-            background: #eafaf1;
-            color: #27ae60;
-            border: 1px solid #a9dfbf;
+            background: #f0fdf4;
+            color: var(--success);
+            border: 1px solid #bbf7d0;
         }
         
         /* Train Info Cards */
         .train-overview {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-md);
+            animation: fadeIn 0.8s ease-out;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .train-overview:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-5px);
         }
         
         .train-header {
@@ -180,158 +311,227 @@
             gap: 2rem;
             align-items: center;
             margin-bottom: 2rem;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1.5rem;
         }
         
         .train-title h2 {
             font-size: 2rem;
-            color: #2c3e50;
+            color: var(--secondary);
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
         
         .train-number {
             font-size: 1.2rem;
-            color: #3498db;
+            color: var(--primary);
             font-weight: 600;
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(52, 152, 219, 0.1);
+            border-radius: 20px;
         }
         
         .train-route {
             font-size: 1rem;
-            color: #7f8c8d;
-            margin: 0.5rem 0;
+            color: var(--text-light);
+            margin: 0.75rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .status-badge {
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 10px 20px;
+            border-radius: 24px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: var(--shadow-sm);
+            animation: pulse 2s infinite;
         }
         
         .status-ontime {
-            background: #d5f4e6;
-            color: #27ae60;
+            background: #d1fae5;
+            color: var(--success);
         }
         
         .status-delayed {
-            background: #fceaea;
-            color: #e74c3c;
+            background: #fee2e2;
+            color: var(--error);
         }
         
         .status-unknown {
-            background: #e8f4fd;
-            color: #3498db;
+            background: #dbeafe;
+            color: var(--primary);
         }
         
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
+            gap: 1.5rem;
+            margin: 2.5rem 0;
         }
         
         .stat-card {
-            background: #f8f9fa;
-            padding: 1.5rem;
-            border-radius: 8px;
+            background: var(--light);
+            padding: 1.75rem;
+            border-radius: 12px;
             text-align: center;
-            border-left: 4px solid #3498db;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
         }
         
         .stat-card h3 {
-            font-size: 1.8rem;
-            color: #2c3e50;
+            font-size: 2rem;
+            color: var(--secondary);
             margin-bottom: 0.5rem;
+            font-weight: 700;
         }
         
         .stat-card p {
-            color: #7f8c8d;
+            color: var(--text-light);
             font-weight: 500;
+            font-size: 0.9rem;
         }
         
         /* Route Table */
         .route-section {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: var(--shadow-md);
+            animation: fadeIn 0.8s ease-out;
         }
         
         .section-title {
             font-size: 1.5rem;
-            color: #2c3e50;
+            color: var(--secondary);
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .route-table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .route-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .route-table th,
+        .route-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .route-table th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--secondary);
+            position: sticky;
+            top: 0;
+            white-space: nowrap;
+        }
+        
+        .route-table tr {
+            transition: var(--transition);
+        }
+        
+        .route-table tr:hover {
+            background: #f1f5f9;
+        }
+        
+        .delay-positive {
+            color: var(--error);
+            font-weight: 600;
+        }
+        
+        .delay-zero {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .current-station {
+            background: #e0f2fe !important;
+            border-left: 4px solid var(--primary);
+            animation: highlight 2s ease;
+        }
+        
+        /* Live Status */
+        .live-status {
+            background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+            color: white;
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        .live-status::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23dots)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .live-status h3 {
+            font-size: 1.4rem;
             margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 2;
             display: flex;
             align-items: center;
             gap: 0.5rem;
         }
         
-        .route-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        
-        .route-table th,
-        .route-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-        }
-        
-        .route-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-        
-        .route-table tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .delay-positive {
-            color: #e74c3c;
-            font-weight: 600;
-        }
-        
-        .delay-zero {
-            color: #27ae60;
-            font-weight: 600;
-        }
-        
-        .current-station {
-            background: #e8f4fd;
-            border-left: 4px solid #3498db;
-        }
-        
-        /* Live Status */
-        .live-status {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .live-status h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-        }
-        
         .status-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
+            gap: 1.25rem;
+            position: relative;
+            z-index: 2;
         }
         
         .status-item {
             background: rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            border-radius: 8px;
+            padding: 1.25rem;
+            border-radius: 10px;
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+        
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-3px);
         }
         
         .status-item strong {
@@ -339,36 +539,91 @@
             margin-bottom: 0.5rem;
             font-size: 0.9rem;
             opacity: 0.9;
+            font-weight: 500;
         }
         
         .status-item span {
-            font-size: 1.1rem;
+            font-size: 1.15rem;
             font-weight: 600;
         }
         
         /* Loading */
         .loading {
             text-align: center;
-            padding: 3rem;
-            color: #7f8c8d;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+            animation: fadeIn 0.5s ease-out;
         }
         
         .loading-spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #ecf0f1;
-            border-top: 4px solid #3498db;
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            margin: 0 auto 1.5rem;
         }
         
+        .loading p {
+            font-size: 1.1rem;
+        }
+        
+        /* Animations */
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
         
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
+        }
+        
+        @keyframes highlight {
+            0% { background-color: rgba(52, 152, 219, 0.5); }
+            100% { background-color: #e0f2fe; }
+        }
+        
         /* Responsive */
+        @media (max-width: 968px) {
+            .search-form {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .search-btn {
+                grid-column: span 2;
+            }
+        }
+        
         @media (max-width: 768px) {
             .navbar {
                 padding: 1rem;
@@ -377,7 +632,20 @@
             }
             
             .nav-links {
-                gap: 1rem;
+                gap: 0.75rem;
+            }
+            
+            .header {
+                padding: 2rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .search-section {
+                margin: -1rem 1rem 0;
+                padding: 2rem 1.5rem;
             }
             
             .search-form {
@@ -385,22 +653,38 @@
                 gap: 1rem;
             }
             
+            .search-btn {
+                grid-column: span 1;
+            }
+            
+            .content {
+                padding: 0 1rem;
+                margin: 2rem auto;
+            }
+            
             .train-header {
                 grid-template-columns: 1fr;
                 text-align: center;
+                gap: 1.5rem;
             }
             
             .stats-grid {
                 grid-template-columns: 1fr;
             }
             
+            .train-overview,
+            .route-section,
+            .live-status {
+                padding: 1.75rem;
+            }
+            
             .route-table {
-                font-size: 0.9rem;
+                font-size: 0.85rem;
             }
             
             .route-table th,
             .route-table td {
-                padding: 8px 4px;
+                padding: 0.75rem 0.5rem;
             }
         }
     </style>
@@ -408,18 +692,21 @@
 <body>
     <!-- Navigation -->
     <nav class="navbar">
-        <div class="logo">🚂 RailTrack Pro</div>
+        <div class="logo"><i class="fas fa-train"></i> RailTrack Pro</div>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
             <li><a href="/map">Live Map</a></li>
-            <li><a href="/analysis">Train Analysis</a></li>
+            <li><a href="/analysis" class="active">Train Analysis</a></li>
+            <li><a href="/upcoming">Upcoming Features</a></li>
         </ul>
     </nav>
 
     <!-- Header -->
     <div class="header">
-        <h1>📊 Comprehensive Train Analysis</h1>
-        <p>Detailed insights, route analysis, and real-time performance metrics</p>
+        <div class="header-content">
+            <h1><i class="fas fa-chart-line"></i> Comprehensive Train Analysis</h1>
+            <p>Detailed insights, route analysis, and real-time performance metrics</p>
+        </div>
     </div>
 
     <!-- Search Section -->
@@ -427,21 +714,19 @@
         <div class="search-container">
             <form class="search-form" id="searchForm">
                 <div class="form-group">
-                    <label for="trainNumber">Train Number</label>
+                    <label for="trainNumber"><i class="fas fa-train"></i> Train Number</label>
                     <input type="text" id="trainNumber" name="trainNumber" 
                            placeholder="e.g., 12301" 
                            value="<%= typeof searchedTrain !== 'undefined' ? searchedTrain : '' %>" required>
                 </div>
                 <div class="form-group">
-                    <label for="journeyDate">Journey Date</label>
+                    <label for="journeyDate"><i class="fas fa-calendar-alt"></i> Journey Date</label>
                     <input type="date" id="journeyDate" name="journeyDate" 
                            value="<%= typeof searchedDate !== 'undefined' ? searchedDate : new Date().toISOString().split('T')[0] %>">
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="search-btn" id="searchBtn">
-                        🔍 Analyze Train
-                    </button>
-                </div>
+                <button type="submit" class="search-btn" id="searchBtn">
+                    <i class="fas fa-search"></i> Analyze Train
+                </button>
             </form>
         </div>
     </div>
@@ -450,7 +735,7 @@
     <div class="content">
         <% if (error) { %>
             <div class="message error">
-                ❌ <%= error %>
+                <i class="fas fa-exclamation-circle"></i> <%= error %>
             </div>
         <% } %>
         
@@ -460,25 +745,25 @@
                 <div class="train-header">
                     <div class="train-title">
                         <h2><%= trainData.train.trainName %></h2>
-                        <div class="train-number">Train #<%= trainData.train.trainNumber %></div>
+                        <div class="train-number">#<%= trainData.train.trainNumber %></div>
                         <div class="train-route">
-                            <%= trainData.train.sourceStationName %> → <%= trainData.train.destinationStationName %>
+                            <i class="fas fa-route"></i> <%= trainData.train.sourceStationName %> → <%= trainData.train.destinationStationName %>
                         </div>
                         <div class="train-route">
-                            Zone: <%= trainData.train.zone || 'N/A' %> | Type: <%= trainData.train.type || 'N/A' %>
+                            <i class="fas fa-tag"></i> Zone: <%= trainData.train.zone || 'N/A' %> | Type: <%= trainData.train.type || 'N/A' %>
                         </div>
                     </div>
                     <div>
                         <% if (trainData.liveData && trainData.liveData.overallDelayMinutes !== undefined) { %>
                             <% if (trainData.liveData.overallDelayMinutes === 0) { %>
-                                <div class="status-badge status-ontime">✅ On Time</div>
+                                <div class="status-badge status-ontime"><i class="fas fa-check-circle"></i> On Time</div>
                             <% } else if (trainData.liveData.overallDelayMinutes > 0) { %>
-                                <div class="status-badge status-delayed">⏰ Delayed by <%= trainData.liveData.overallDelayMinutes %> min</div>
+                                <div class="status-badge status-delayed"><i class="fas fa-clock"></i> Delayed by <%= trainData.liveData.overallDelayMinutes %> min</div>
                             <% } else { %>
-                                <div class="status-badge status-unknown">📍 Status Unknown</div>
+                                <div class="status-badge status-unknown"><i class="fas fa-question-circle"></i> Status Unknown</div>
                             <% } %>
                         <% } else { %>
-                            <div class="status-badge status-unknown">📍 Status Unknown</div>
+                            <div class="status-badge status-unknown"><i class="fas fa-question-circle"></i> Status Unknown</div>
                         <% } %>
                     </div>
                 </div>
@@ -507,7 +792,7 @@
             <!-- Live Status -->
             <% if (trainData.liveData && trainData.liveData.currentLocation) { %>
                 <div class="live-status">
-                    <h3>🔴 Live Status</h3>
+                    <h3><i class="fas fa-circle-notch fa-spin"></i> Live Status</h3>
                     <div class="status-grid">
                         <div class="status-item">
                             <strong>Current Location:</strong>
@@ -519,7 +804,7 @@
                         </div>
                         <div class="status-item">
                             <strong>Last Updated:</strong>
-                            <span><%= trainData.liveData.lastUpdatedAt ? new Date(trainData.liveData.lastUpdatedAt).toLocaleTimeString() : 'N/A' %></span>
+                            <span data-last-updated><%= trainData.liveData.lastUpdatedAt ? new Date(trainData.liveData.lastUpdatedAt).toLocaleTimeString() : 'N/A' %></span>
                         </div>
                         <div class="status-item">
                             <strong>Data Source:</strong>
@@ -531,8 +816,8 @@
 
             <!-- Route Analysis -->
             <div class="route-section">
-                <h3 class="section-title">🛤️ Route Analysis</h3>
-                <div style="overflow-x: auto;">
+                <h3 class="section-title"><i class="fas fa-route"></i> Route Analysis</h3>
+                <div class="route-table-container">
                     <table class="route-table">
                         <thead>
                             <tr>
@@ -557,7 +842,7 @@
                                     <td>
                                         <strong><%= station.stationName %></strong><br>
                                         <small><%= station.stationCode %></small>
-                                        <% if (isCurrent) { %><br><small style="color: #3498db;">📍 Current Location</small><% } %>
+                                        <% if (isCurrent) { %><br><small style="color: var(--primary);"><i class="fas fa-location-dot"></i> Current Location</small><% } %>
                                     </td>
                                     <td>
                                         <% if (station.scheduledArrival) { %>
@@ -581,12 +866,12 @@
                                     <td>
                                         <% if (liveStation && liveStation.delayArrivalMinutes !== undefined) { %>
                                             <% if (liveStation.delayArrivalMinutes === 0) { %>
-                                                <span class="delay-zero">On Time</span>
+                                                <span class="delay-zero"><i class="fas fa-check"></i> On Time</span>
                                             <% } else { %>
-                                                <span class="delay-positive">+<%= liveStation.delayArrivalMinutes %> min</span>
+                                                <span class="delay-positive"><i class="fas fa-clock"></i> +<%= liveStation.delayArrivalMinutes %> min</span>
                                             <% } %>
                                         <% } else { %>
-                                            <span style="color: #7f8c8d;">Scheduled</span>
+                                            <span style="color: var(--text-light);">Scheduled</span>
                                         <% } %>
                                     </td>
                                 </tr>
@@ -599,8 +884,8 @@
             <!-- Train Crossings -->
             <% if (trainData.crossings && trainData.crossings.length > 0) { %>
                 <div class="route-section">
-                    <h3 class="section-title">🚉 Train Crossings</h3>
-                    <div style="overflow-x: auto;">
+                    <h3 class="section-title"><i class="fas fa-train-tram"></i> Train Crossings</h3>
+                    <div class="route-table-container">
                         <table class="route-table">
                             <thead>
                                 <tr>
@@ -650,20 +935,22 @@
             
             // Update button state
             searchBtn.disabled = true;
-            searchBtn.innerHTML = '🔄 Analyzing...';
+            searchBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Analyzing...';
             
             // Redirect to analysis page with parameters
             const url = `/analysis/${trainNumber}?date=${journeyDate}`;
             window.location.href = url;
         });
         
-        // Format time function
-        function formatTime(minutes) {
-            if (!minutes && minutes !== 0) return 'N/A';
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-        }
+        // Add scroll effect to navbar
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
         
         // Auto-refresh live data every 2 minutes if train data exists
         <% if (trainData && trainData.liveData) { %>
