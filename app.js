@@ -33,7 +33,7 @@ app.use(express.static(publicDir));
 app.use(express.json());
 
 // Replace with your actual API key
-const API_KEY = 'rr_live_N9W_-4m7htMPq8lsdDGuA-37MWjFnyWg';
+const API_KEY = '';
 const API_URL = 'https://railradar.in/api/v1/trains/live-map';
 
 // Route to render the home page
