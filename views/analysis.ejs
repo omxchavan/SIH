@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train Analysis - RailTrack Pro</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        
+        .nav-links a:hover {
+            background: #3498db;
+            color: white;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Search Section */
+        .search-section {
+            background: white;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .search-form {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #2c3e50;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .search-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+        
+        .search-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Content */
+        .content {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        /* Error/Status Messages */
+        .message {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .message.error {
+            background: #fee;
+            color: #c0392b;
+            border: 1px solid #fadbd8;
+        }
+        
+        .message.success {
+            background: #eafaf1;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+        
+        /* Train Info Cards */
+        .train-overview {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .train-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 2rem;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 1rem;
+        }
+        
+        .train-title h2 {
+            font-size: 2rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .train-number {
+            font-size: 1.2rem;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .train-route {
+            font-size: 1rem;
+            color: #7f8c8d;
+            margin: 0.5rem 0;
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .status-ontime {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+        
+        .status-delayed {
+            background: #fceaea;
+            color: #e74c3c;
+        }
+        
+        .status-unknown {
+            background: #e8f4fd;
+            color: #3498db;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #3498db;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card p {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        /* Route Table */
+        .route-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .route-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .route-table th,
+        .route-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .route-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .route-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .delay-positive {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .delay-zero {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .current-station {
+            background: #e8f4fd;
+            border-left: 4px solid #3498db;
+        }
+        
+        /* Live Status */
+        .live-status {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .live-status h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .status-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-item strong {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .status-item span {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: #7f8c8d;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #ecf0f1;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                gap: 1rem;
+            }
+            
+            .search-form {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .train-header {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .route-table {
+                font-size: 0.9rem;
+            }
+            
+            .route-table th,
+            .route-table td {
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">🚂 RailTrack Pro</div>
+        <ul class="nav-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/map">Live Map</a></li>
+            <li><a href="/analysis">Train Analysis</a></li>
+        </ul>
+    </nav>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>📊 Comprehensive Train Analysis</h1>
+        <p>Detailed insights, route analysis, and real-time performance metrics</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-container">
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="trainNumber">Train Number</label>
+                    <input type="text" id="trainNumber" name="trainNumber" 
+                           placeholder="e.g., 12301" 
+                           value="<%= typeof searchedTrain !== 'undefined' ? searchedTrain : '' %>" required>
+                </div>
+                <div class="form-group">
+                    <label for="journeyDate">Journey Date</label>
+                    <input type="date" id="journeyDate" name="journeyDate" 
+                           value="<%= typeof searchedDate !== 'undefined' ? searchedDate : new Date().toISOString().split('T')[0] %>">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="search-btn" id="searchBtn">
+                        🔍 Analyze Train
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <% if (error) { %>
+            <div class="message error">
+                ❌ <%= error %>
+            </div>
+        <% } %>
+        
+        <% if (trainData) { %>
+            <!-- Train Overview -->
+            <div class="train-overview">
+                <div class="train-header">
+                    <div class="train-title">
+                        <h2><%= trainData.train.trainName %></h2>
+                        <div class="train-number">Train #<%= trainData.train.trainNumber %></div>
+                        <div class="train-route">
+                            <%= trainData.train.sourceStationName %> → <%= trainData.train.destinationStationName %>
+                        </div>
+                        <div class="train-route">
+                            Zone: <%= trainData.train.zone || 'N/A' %> | Type: <%= trainData.train.type || 'N/A' %>
+                        </div>
+                    </div>
+                    <div>
+                        <% if (trainData.liveData && trainData.liveData.overallDelayMinutes !== undefined) { %>
+                            <% if (trainData.liveData.overallDelayMinutes === 0) { %>
+                                <div class="status-badge status-ontime">✅ On Time</div>
+                            <% } else if (trainData.liveData.overallDelayMinutes > 0) { %>
+                                <div class="status-badge status-delayed">⏰ Delayed by <%= trainData.liveData.overallDelayMinutes %> min</div>
+                            <% } else { %>
+                                <div class="status-badge status-unknown">📍 Status Unknown</div>
+                            <% } %>
+                        <% } else { %>
+                            <div class="status-badge status-unknown">📍 Status Unknown</div>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3><%= trainData.route.length %></h3>
+                        <p>Total Stations</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><%= trainData.liveData ? (trainData.liveData.overallDelayMinutes || 0) : 0 %> min</h3>
+                        <p>Current Delay</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><%= trainData.liveData && trainData.liveData.currentLocation ? trainData.liveData.currentLocation.distanceFromOriginKm || 0 : 0 %> km</h3>
+                        <p>Distance Covered</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><%= trainData.crossings ? trainData.crossings.length : 0 %></h3>
+                        <p>Train Crossings</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Status -->
+            <% if (trainData.liveData && trainData.liveData.currentLocation) { %>
+                <div class="live-status">
+                    <h3>🔴 Live Status</h3>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <strong>Current Location:</strong>
+                            <span><%= trainData.liveData.currentLocation.stationCode || 'Unknown' %></span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Status:</strong>
+                            <span><%= trainData.liveData.currentLocation.status || 'Unknown' %></span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Last Updated:</strong>
+                            <span><%= trainData.liveData.lastUpdatedAt ? new Date(trainData.liveData.lastUpdatedAt).toLocaleTimeString() : 'N/A' %></span>
+                        </div>
+                        <div class="status-item">
+                            <strong>Data Source:</strong>
+                            <span><%= trainData.liveData.dataSource || 'RailRadar' %></span>
+                        </div>
+                    </div>
+                </div>
+            <% } %>
+
+            <!-- Route Analysis -->
+            <div class="route-section">
+                <h3 class="section-title">🛤️ Route Analysis</h3>
+                <div style="overflow-x: auto;">
+                    <table class="route-table">
+                        <thead>
+                            <tr>
+                                <th>Station</th>
+                                <th>Arrival</th>
+                                <th>Departure</th>
+                                <th>Halt</th>
+                                <th>Distance</th>
+                                <th>Platform</th>
+                                <th>Delay Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% trainData.route.forEach((station, index) => { %>
+                                <% 
+                                    const liveStation = trainData.liveData && trainData.liveData.route ? 
+                                        trainData.liveData.route.find(ls => ls.station.code === station.stationCode) : null;
+                                    const isCurrent = trainData.liveData && trainData.liveData.currentLocation && 
+                                        trainData.liveData.currentLocation.stationCode === station.stationCode;
+                                %>
+                                <tr class="<%= isCurrent ? 'current-station' : '' %>">
+                                    <td>
+                                        <strong><%= station.stationName %></strong><br>
+                                        <small><%= station.stationCode %></small>
+                                        <% if (isCurrent) { %><br><small style="color: #3498db;">📍 Current Location</small><% } %>
+                                    </td>
+                                    <td>
+                                        <% if (station.scheduledArrival) { %>
+                                            <%= Math.floor(station.scheduledArrival / 60).toString().padStart(2, '0') %>:<%= (station.scheduledArrival % 60).toString().padStart(2, '0') %>
+                                        <% } else { %>
+                                            Source
+                                        <% } %>
+                                        <% if (liveStation && liveStation.actualArrival) { %>
+                                            <br><small>Actual: <%= Math.floor(liveStation.actualArrival / 60).toString().padStart(2, '0') %>:<%= (liveStation.actualArrival % 60).toString().padStart(2, '0') %></small>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <%= Math.floor(station.scheduledDeparture / 60).toString().padStart(2, '0') %>:<%= (station.scheduledDeparture % 60).toString().padStart(2, '0') %>
+                                        <% if (liveStation && liveStation.actualDeparture) { %>
+                                            <br><small>Actual: <%= Math.floor(liveStation.actualDeparture / 60).toString().padStart(2, '0') %>:<%= (liveStation.actualDeparture % 60).toString().padStart(2, '0') %></small>
+                                        <% } %>
+                                    </td>
+                                    <td><%= station.haltDurationMinutes || 0 %> min</td>
+                                    <td><%= station.distanceFromOriginKm || 0 %> km</td>
+                                    <td><%= station.platform || 'TBD' %></td>
+                                    <td>
+                                        <% if (liveStation && liveStation.delayArrivalMinutes !== undefined) { %>
+                                            <% if (liveStation.delayArrivalMinutes === 0) { %>
+                                                <span class="delay-zero">On Time</span>
+                                            <% } else { %>
+                                                <span class="delay-positive">+<%= liveStation.delayArrivalMinutes %> min</span>
+                                            <% } %>
+                                        <% } else { %>
+                                            <span style="color: #7f8c8d;">Scheduled</span>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Train Crossings -->
+            <% if (trainData.crossings && trainData.crossings.length > 0) { %>
+                <div class="route-section">
+                    <h3 class="section-title">🚉 Train Crossings</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="route-table">
+                            <thead>
+                                <tr>
+                                    <th>Station</th>
+                                    <th>Crossing Train</th>
+                                    <th>Event Type</th>
+                                    <th>Sequence</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% trainData.crossings.forEach(crossing => { %>
+                                    <tr>
+                                        <td><%= crossing.stationCode %></td>
+                                        <td>
+                                            <strong><%= crossing.crossedTrainName %></strong><br>
+                                            <small>#<%= crossing.crossedTrainNumber %></small>
+                                        </td>
+                                        <td><%= crossing.eventType %></td>
+                                        <td><%= crossing.sequence %></td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            <% } %>
+        <% } else if (!error) { %>
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Enter train number above to view detailed analysis</p>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const trainNumber = document.getElementById('trainNumber').value.trim();
+            const journeyDate = document.getElementById('journeyDate').value;
+            const searchBtn = document.getElementById('searchBtn');
+            
+            if (!trainNumber) {
+                alert('Please enter a train number');
+                return;
+            }
+            
+            // Update button state
+            searchBtn.disabled = true;
+            searchBtn.innerHTML = '🔄 Analyzing...';
+            
+            // Redirect to analysis page with parameters
+            const url = `/analysis/${trainNumber}?date=${journeyDate}`;
+            window.location.href = url;
+        });
+        
+        // Format time function
+        function formatTime(minutes) {
+            if (!minutes && minutes !== 0) return 'N/A';
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+        }
+        
+        // Auto-refresh live data every 2 minutes if train data exists
+        <% if (trainData && trainData.liveData) { %>
+            setInterval(() => {
+                const trainNumber = '<%= trainData.train.trainNumber %>';
+                const journeyDate = '<%= typeof searchedDate !== "undefined" ? searchedDate : new Date().toISOString().split("T")[0] %>';
+                
+                fetch(`/api/trains/${trainNumber}?date=${journeyDate}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Update last updated time
+                            const lastUpdatedElements = document.querySelectorAll('[data-last-updated]');
+                            lastUpdatedElements.forEach(el => {
+                                if (data.data.liveData && data.data.liveData.lastUpdatedAt) {
+                                    el.textContent = new Date(data.data.liveData.lastUpdatedAt).toLocaleTimeString();
+                                }
+                            });
+                        }
+                    })
+                    .catch(error => console.log('Auto-refresh failed:', error));
+            }, 120000); // 2 minutes
+        <% } %>
+    </script>
+</body>
+</html>

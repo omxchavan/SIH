@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pune Live Train Tracker</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .controls {
+            background: white;
+            padding: 10px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .refresh-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #45a049;
+        }
+        
+        .refresh-btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .status {
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #map {
+            height: calc(100vh - 120px);
+            width: 100%;
+        }
+        
+        .train-popup {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .train-popup h3 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .train-popup p {
+            margin: 3px 0;
+        }
+        
+        .train-popup .train-number {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🚂 Pune Live Train Tracker</h1>
+    </div>
+    
+    <div class="controls">
+        <button class="refresh-btn" onclick="refreshTrains()">🔄 Refresh Data</button>
+        <div id="status" class="status">
+            <% if (error) { %>
+                <span class="status error">❌ <%= error %></span>
+            <% } else { %>
+                <span class="status success">✅ Showing <%= trains.length %> active trains</span>
+            <% } %>
+        </div>
+        <div>Last updated: <span id="lastUpdated"><%= new Date().toLocaleTimeString() %></span></div>
+    </div>
+    
+    <div id="map"></div>
+    <div class="loading" id="loading">🔄 Loading train data...</div>
+    
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        let map;
+        let trainMarkers = [];
+        
+        // Initialize map centered on Pune
+        function initMap() {
+            map = L.map('map').setView([18.5204, 73.8567], 11);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+        }
+        
+        // Create custom train icon
+        function createTrainIcon(trainType) {
+            const color = getTrainColor(trainType);
+            return L.divIcon({
+                html: `<div style="
+                    background: ${color};
+                    width: 12px;
+                    height: 12px;
+                    border-radius: 50%;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                "></div>`,
+                className: 'custom-train-icon',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+        }
+        
+        // Get color based on train type
+        function getTrainColor(trainType) {
+            const colors = {
+                'EXPRESS': '#e74c3c',
+                'PASSENGER': '#3498db',
+                'SUPERFAST': '#f39c12',
+                'LOCAL': '#27ae60',
+                'RAJDHANI': '#9b59b6',
+                'SHATABDI': '#e67e22'
+            };
+            return colors[trainType?.toUpperCase()] || '#34495e';
+        }
+        
+        // Clear existing markers
+        function clearMarkers() {
+            trainMarkers.forEach(marker => map.removeLayer(marker));
+            trainMarkers = [];
+        }
+        
+        // Add trains to map
+        function addTrainsToMap(trains) {
+            clearMarkers();
+            
+            trains.forEach(train => {
+                if (train.current_lat && train.current_lng) {
+                    const marker = L.marker([train.current_lat, train.current_lng], {
+                        icon: createTrainIcon(train.type)
+                    }).addTo(map);
+                    
+                    const popupContent = `
+                        <div class="train-popup">
+                            <h3>${train.train_name}</h3>
+                            <p><span class="train-number">Train #${train.train_number}</span></p>
+                            <p><strong>Type:</strong> ${train.type || 'N/A'}</p>
+                            <p><strong>Current Station:</strong> ${train.current_station_name || 'Unknown'}</p>
+                            <p><strong>Next Station:</strong> ${train.next_station_name || 'Unknown'}</p>
+                            <p><strong>Distance from Source:</strong> ${train.distance_from_source_km || 0} km</p>
+                            <p><strong>Next Distance:</strong> ${train.next_distance || 0} km</p>
+                            ${train.departure_minutes ? `<p><strong>Departed:</strong> ${train.departure_minutes} min ago</p>` : ''}
+                            ${train.next_arrival_minutes ? `<p><strong>Next Arrival:</strong> ${train.next_arrival_minutes} min</p>` : ''}
+                        </div>
+                    `;
+                    
+                    marker.bindPopup(popupContent);
+                    trainMarkers.push(marker);
+                    
+                    // Add next station marker if available
+                    if (train.next_lat && train.next_lng) {
+                        const nextStationMarker = L.circleMarker([train.next_lat, train.next_lng], {
+                            color: '#95a5a6',
+                            fillColor: '#bdc3c7',
+                            fillOpacity: 0.7,
+                            radius: 4
+                        }).addTo(map);
+                        
+                        nextStationMarker.bindPopup(`
+                            <div class="train-popup">
+                                <h3>Next Station</h3>
+                                <p><strong>${train.next_station_name}</strong></p>
+                                <p>Expected arrival: ${train.next_arrival_minutes || 'N/A'} min</p>
+                            </div>
+                        `);
+                        
+                        trainMarkers.push(nextStationMarker);
+                        
+                        // Draw line between current position and next station
+                        const line = L.polyline([
+                            [train.current_lat, train.current_lng],
+                            [train.next_lat, train.next_lng]
+                        ], {
+                            color: getTrainColor(train.type),
+                            weight: 2,
+                            opacity: 0.5,
+                            dashArray: '5, 5'
+                        }).addTo(map);
+                        
+                        trainMarkers.push(line);
+                    }
+                }
+            });
+        }
+        
+        // Refresh train data
+        async function refreshTrains() {
+            const button = document.querySelector('.refresh-btn');
+            const loading = document.getElementById('loading');
+            const status = document.getElementById('status');
+            const lastUpdated = document.getElementById('lastUpdated');
+            
+            button.disabled = true;
+            button.textContent = '🔄 Loading...';
+            loading.style.display = 'block';
+            
+            try {
+                const response = await fetch('/api/trains');
+                const data = await response.json();
+                
+                if (data.success) {
+                    addTrainsToMap(data.trains);
+                    status.innerHTML = `<span class="status success">✅ Showing ${data.trains.length} active trains</span>`;
+                    lastUpdated.textContent = new Date().toLocaleTimeString();
+                } else {
+                    status.innerHTML = `<span class="status error">❌ ${data.error}</span>`;
+                }
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+                status.innerHTML = `<span class="status error">❌ Failed to refresh data</span>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = '🔄 Refresh Data';
+                loading.style.display = 'none';
+            }
+        }
+        
+        // Initialize map and load initial data
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Load initial train data
+            const initialTrains = <%- JSON.stringify(trains) %>;
+            if (initialTrains && initialTrains.length > 0) {
+                addTrainsToMap(initialTrains);
+            }
+            
+            // Auto-refresh every 30 seconds
+            setInterval(refreshTrains, 30000);
+        });
+    </script>
+</body>
+</html>
