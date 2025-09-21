@@ -36,7 +36,7 @@ app.use(express.json());
 
 const API_KEY = process.env.API_KEY;
 const API_URL = "https://railradar.in/api/v1/trains/live-map";
-
+console.log(API_KEY)
 // Route to render the home page
 app.get("/", (req, res) => {
   res.render("index");

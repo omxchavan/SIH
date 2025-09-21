@@ -951,29 +951,6 @@
                 navbar.classList.remove('scrolled');
             }
         });
-        
-        // Auto-refresh live data every 2 minutes if train data exists
-        <% if (trainData && trainData.liveData) { %>
-            setInterval(() => {
-                const trainNumber = '<%= trainData.train.trainNumber %>';
-                const journeyDate = '<%= typeof searchedDate !== "undefined" ? searchedDate : new Date().toISOString().split("T")[0] %>';
-                
-                fetch(`/api/trains/${trainNumber}?date=${journeyDate}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Update last updated time
-                            const lastUpdatedElements = document.querySelectorAll('[data-last-updated]');
-                            lastUpdatedElements.forEach(el => {
-                                if (data.data.liveData && data.data.liveData.lastUpdatedAt) {
-                                    el.textContent = new Date(data.data.liveData.lastUpdatedAt).toLocaleTimeString();
-                                }
-                            });
-                        }
-                    })
-                    .catch(error => console.log('Auto-refresh failed:', error));
-            }, 120000); // 2 minutes
-        <% } %>
     </script>
 </body>
 </html>
